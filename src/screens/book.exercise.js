@@ -6,8 +6,7 @@ import debounceFn from 'debounce-fn'
 import {FaRegCalendarAlt} from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
 import {useParams} from 'react-router-dom'
-// 🐨 you'll need these:
-// import {useQuery, useMutation, queryCache} from 'react-query'
+import {useQuery, useMutation, queryCache} from 'react-query'
 import {useAsync} from 'utils/hooks'
 import {client} from 'utils/api-client'
 import {formatDate} from 'utils/misc'
@@ -29,27 +28,28 @@ const loadingBook = {
 
 function BookScreen({user}) {
   const {bookId} = useParams()
-  // 💣 remove the useAsync call here
-  const {data, run} = useAsync()
-
+  const {data} = useQuery(
+    ['book', {bookId}],
+    async () => await client(`books/${bookId}`, {token: user.token}),
+  )
+  const book = data?.book ?? loadingBook
+  const listItems = useQuery(
+    'list-items',
+    async () => await client('list-items', {token: user.token}),
+  )?.data?.listItems
   // 🐨 call useQuery here
   // queryKey should be ['book', {bookId}]
   // queryFn should be what's currently passed in the run function below
-
-  // 💣 remove the useEffect here (react-query will handle that now)
-  React.useEffect(() => {
-    run(client(`books/${bookId}`, {token: user.token}))
-  }, [run, bookId, user.token])
-
+  // 🐨 search through the listItems you got from react-query and find the
+  // one with the right bookId.
+	const listItem = listItems?.filter((itemBook) => itemBook.bookId === book.id)[0] || null;
   // 🐨 call useQuery to get the list item from the list-items endpoint
   // queryKey should be 'list-items'
   // queryFn should call the 'list-items' endpoint with the user's token
-  const listItem = null
   // 🦉 NOTE: the backend doesn't support getting a single list-item by it's ID
   // and instead expects us to cache all the list items and look them up in our
   // cache. This works out because we're using react-query for caching!
 
-  const book = data?.book ?? loadingBook
   const {title, author, coverImageUrl, publisher, synopsis} = book
 
   return (
@@ -138,12 +138,24 @@ function NotesTextarea({listItem, user}) {
   //   you can pass as data.
   // 💰 if you want to get the list-items cache updated after this query finishes
   // the use the `onSettled` config option to queryCache.invalidateQueries('list-items')
-  // 💣 DELETE THIS ESLINT IGNORE!! Don't ignore the exhaustive deps rule please
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const mutate = () => {}
-  const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
-    mutate,
-  ])
+  const [mutate] = useMutation(
+    async data => {
+      await client(`list-items/${data.id}`, {
+        data,
+        method: 'PUT',
+        token: user.token,
+      })
+    },
+    {
+      onSettled: () => {
+        queryCache.invalidateQueries('list-items')
+      },
+    },
+  )
+  const debouncedMutate = React.useMemo(
+    () => debounceFn(mutate, {wait: 300}),
+    [mutate],
+  )
 
   function handleNotesChange(e) {
     debouncedMutate({id: listItem.id, notes: e.target.value})
