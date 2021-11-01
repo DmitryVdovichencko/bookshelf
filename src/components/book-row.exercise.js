@@ -3,6 +3,7 @@ import {jsx} from '@emotion/core'
 
 import {Link} from 'react-router-dom'
 import {useQuery} from 'react-query'
+import {useListItem} from '../utils/hooks'
 import {client} from 'utils/api-client'
 import * as mq from 'styles/media-queries'
 import * as colors from 'styles/colors'
@@ -11,9 +12,7 @@ import {Rating} from './rating'
 
 function BookRow({user, book}) {
   const {title, author, coverImageUrl} = book
-
-	const { isLoading, isError, data, error } = useQuery('list-items', async () => await client('list-items', {token: user.token}));
-	const listItem = data?.listItems?.filter((itemBook) => itemBook.bookId === book.id)[0] || null;
+	const { listItem = null } = useListItem(user,book.id);
   const id = `book-row-book-${book.id}`
 
   return (

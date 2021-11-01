@@ -3,6 +3,7 @@ import {jsx} from '@emotion/core'
 
 import * as React from 'react'
 import {useMutation, queryCache} from 'react-query'
+import {useUpdateListItem} from '../utils/hooks';
 import {client} from 'utils/api-client'
 import {FaStar} from 'react-icons/fa'
 import * as colors from 'styles/colors'
@@ -28,13 +29,7 @@ function Rating({listItem, user}) {
   // 💰 if you want to get the list-items cache updated after this query finishes
   // the use the `onSettled` config option to queryCache.invalidateQueries('list-items')
 
-	const [update] = useMutation(async (data) => {
-		await client(`list-items/${listItem.id}`, {data, method:"PUT", token: user.token})
-	}, {
-		onSettled: () => {
-			queryCache.invalidateQueries('list-items')
-		},
-	});
+	const [update] = useUpdateListItem(user);
   React.useEffect(() => {
     function handleKeyDown(event) {
       if (event.key === 'Tab') {
