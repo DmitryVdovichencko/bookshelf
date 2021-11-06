@@ -1,8 +1,6 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
-import {useQuery} from 'react-query'
-import {client} from 'utils/api-client'
-import {useListItems} from 'utils/hooks'
+import {useListItems} from 'utils/list-items'
 import {BookListUL} from './lib'
 import {BookRow} from './book-row'
 
@@ -12,7 +10,7 @@ function ListItemList({
   noListItems,
   noFilteredListItems,
 }) {
-	const { data: listItems, isLoading } = useListItems(user)
+	const { listItems, isLoading } = useListItems(user)
 
   // 🐨 call useQuery to get the list-items from the 'list-items' endpoint
   // queryKey should be 'list-items'

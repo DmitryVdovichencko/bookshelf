@@ -2,9 +2,7 @@
 import {jsx} from '@emotion/core'
 
 import {Link} from 'react-router-dom'
-import {useQuery} from 'react-query'
-import {useListItem} from '../utils/hooks'
-import {client} from 'utils/api-client'
+import {useListItem} from '../utils/list-items'
 import * as mq from 'styles/media-queries'
 import * as colors from 'styles/colors'
 import {StatusButtons} from './status-buttons'
@@ -12,7 +10,7 @@ import {Rating} from './rating'
 
 function BookRow({user, book}) {
   const {title, author, coverImageUrl} = book
-	const { listItem = null } = useListItem(user,book.id);
+	const { listItem } = useListItem(user,book.id);
   const id = `book-row-book-${book.id}`
 
   return (

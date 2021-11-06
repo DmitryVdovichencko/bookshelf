@@ -70,7 +70,7 @@ function App() {
       </div>
     )
   }
-
+	console.log({error,isError})
   if (isSuccess) {
     const props = {user, login, register, logout}
     return user ? (
