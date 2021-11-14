@@ -21,7 +21,6 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
   function handleClick() {
     run(onClick())
   }
-
   return (
     <Tooltip label={isError ? error.message : label}>
       <CircleButton
@@ -48,9 +47,9 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
 
 function StatusButtons({user, book}) {
   const { listItem } = useListItem(user,book.id);
-	const [update] = useUpdateListItem(user);
-	const [remove] = useRemoveListItem(user);
-	const [create] = useCreateListItem(user);
+	const [update] = useUpdateListItem(user,{throwOnError:true});
+	const [remove] = useRemoveListItem(user,{throwOnError:true});
+	const [create] = useCreateListItem(user,{throwOnError:true});
 
   return (
     <React.Fragment>

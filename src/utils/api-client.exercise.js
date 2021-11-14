@@ -27,8 +27,10 @@ async function client(
     }
     const data = await response.json()
     if (response.ok) {
+			console.log("RESPONSE OK",{data})
       return data
     } else {
+			console.log("RESPONSE NOT OK",{data})
       return Promise.reject(data)
     }
   })

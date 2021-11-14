@@ -14,7 +14,8 @@ import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
 import {useListItem, useUpdateListItem} from 'utils/list-items'
 import {useBook} from 'utils/books.exercise'
-
+import {ErrorMessage} from 'components/lib'
+import {Spinner} from 'components/lib'
 
 function BookScreen({user}) {
   const {bookId} = useParams()
@@ -102,7 +103,7 @@ function ListItemTimeframe({listItem}) {
 }
 
 function NotesTextarea({listItem, user}) {
-	const [mutate] = useUpdateListItem(user);
+	const [mutate, {isError, error, isLoading}] = useUpdateListItem(user);
   const debouncedMutate = React.useMemo(
     () => debounceFn(mutate, {wait: 300}),
     [mutate],
@@ -111,7 +112,7 @@ function NotesTextarea({listItem, user}) {
   function handleNotesChange(e) {
     debouncedMutate({id: listItem.id, notes: e.target.value})
   }
-
+	console.log('Notes mutation err', {isError, error})
   return (
     <React.Fragment>
       <div>
@@ -127,6 +128,16 @@ function NotesTextarea({listItem, user}) {
         >
           Notes
         </label>
+				{
+  isError ? (
+    <ErrorMessage
+      error={error}
+      variant="inline"
+      css={{marginLeft: 6, fontSize: '0.7em'}}
+    />
+  ) : null
+}		
+	{/* {isLoading && <Spinner />} */}
       </div>
       <Textarea
         id="notes"
@@ -134,6 +145,7 @@ function NotesTextarea({listItem, user}) {
         onChange={handleNotesChange}
         css={{width: '100%', minHeight: 300}}
       />
+
     </React.Fragment>
   )
 }
